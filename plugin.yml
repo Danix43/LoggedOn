@@ -1,0 +1,33 @@
+name: LoggedOn
+description: Custom made minecraft spigot server authentification module
+version: 1.0
+api-version: 1.15
+main: com.danix43.LoggedOn.Main
+author: Danix43 - daninitu39@gmail.com
+website: github.com/danix43
+commands:
+   register:
+      description: Register a new account with the password specified as a argument
+      aliases: reg
+      usage: /<command> password
+   login:
+      description: Login into the account using the password specified as a argument
+      aliases: log
+      usage: /<command> password
+   changepass:
+      description: Change the current password with the one specified
+      aliases: cp
+      usage: /<command> currentpassword newpassword
+   admin.changepass:
+      description: Force a password change as an admin
+      aliases: admcp
+      usage: /<command> nameoftheplayer newpassword
+      permission: admin
+      permission-message: You don't have enough clearance to use this!
+permissions:
+   admin:
+      description: Full access role
+      default: op
+   default: 
+      description: Normal user role
+      default: true

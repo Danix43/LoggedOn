@@ -1,0 +1,6 @@
+id 
+nume
+parola 
+ip
+ultima conectare - data
+inventar
