@@ -1,6 +1,6 @@
 package com.danix43.LoggedOn.commands;
 
-import static com.danix43.LoggedOn.PlayerToolkit.unfreezePlayer;
+import static com.danix43.LoggedOn.tools.PlayerToolkit.unfreezePlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class RegisterCommand implements CommandExecutor {
 
@@ -32,7 +33,7 @@ public class RegisterCommand implements CommandExecutor {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (!checkIfPlayerAlreadyRegistered(player)) {
-				registerNewPlayer(player, args[0]);
+				registerNewPlayer(player, BCrypt.hashpw(args[0], BCrypt.gensalt()));
 				return true;
 			} else {
 				player.sendMessage("There is a another account registered with your name!");

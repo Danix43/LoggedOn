@@ -3,12 +3,15 @@ package com.danix43.LoggedOn.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class ChangePassCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-	// TODO Auto-generated method stub
-	return false;
+        if (sender instanceof Player) {
+            
+        }
+        return false;
     }
 }

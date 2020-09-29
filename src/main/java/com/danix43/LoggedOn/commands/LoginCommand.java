@@ -1,24 +1,21 @@
 package com.danix43.LoggedOn.commands;
 
-import static com.danix43.LoggedOn.PlayerToolkit.unfreezePlayer;
-import static com.danix43.LoggedOn.PlayerToolkit.base64ToItemStack;
+import static com.danix43.LoggedOn.tools.PlayerToolkit.unfreezePlayer;
+import static com.danix43.LoggedOn.tools.PlayerToolkit.convertByteArrToItems;
 
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.google.gson.Gson;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class LoginCommand implements CommandExecutor {
-
-	private static final Gson gson = new Gson();
-
 	private static final String ALREADY_EXISTS_QUERY = "SELECT * FROM lo_users WHERE username = ?;";
 	private static final String LOGIN_PLAYER_QUERY = "SELECT password, inventory FROM lo_users WHERE username = ?;";
 
@@ -36,7 +33,6 @@ public class LoginCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-
 			if (playerHasAccount(player)) {
 				logInPlayer(player, args[0]);
 				return true;
@@ -58,7 +54,7 @@ public class LoginCommand implements CommandExecutor {
 			try (ResultSet result = query.executeQuery()) {
 				result.next();
 				String dbPassword = result.getString("password");
-				if (dbPassword.equals(password)) {
+				if (BCrypt.checkpw(password, dbPassword)) {
 					player.sendMessage("You have been logged on! Enjoy!");
 					loadInventory(player);
 					unfreezePlayer(player);
@@ -76,20 +72,21 @@ public class LoginCommand implements CommandExecutor {
 	}
 
 	private void loadInventory(Player player) {
-		String sql = "SELECT inventory FROM lo_users WHERE username = ?;";
+		String sql = "SELECT armor, inventory FROM lo_users WHERE username = ?;";
 
 		try (PreparedStatement query = connection.prepareStatement(sql)) {
 			query.setString(1, player.getName());
 
 			try (ResultSet result = query.executeQuery()) {
 				result.next();
-				
-				String inventory = result.getString("inventory");
 
-				String[] inventoryParts = inventory.split("-");
+				Blob armor = result.getBlob("armor");
+				Blob inventory = result.getBlob("inventory");
 
-				player.getInventory().setArmorContents(base64ToItemStack(inventoryParts[0]));
-				player.getInventory().setStorageContents(base64ToItemStack(inventoryParts[1]));
+				player.getInventory()
+						.setArmorContents(convertByteArrToItems(armor.getBytes(1L, Math.toIntExact(armor.length()))));
+				player.getInventory().setStorageContents(
+						convertByteArrToItems(inventory.getBytes(1L, Math.toIntExact(inventory.length()))));
 
 			} catch (SQLException e) {
 				player.sendMessage("Error retrieving the inventory from database. Error: " + e.getMessage());
