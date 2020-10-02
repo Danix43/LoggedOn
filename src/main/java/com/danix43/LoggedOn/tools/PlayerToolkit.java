@@ -77,12 +77,9 @@ public class PlayerToolkit {
     /**
      * Saves the player's full inventory, divided as armor and storage contents, in
      * different databases rows as BLOBs
-     * 
-     * @param playerName
-     * @param playerArmor     - The player's armor in the four slots
-     * @param playerInventory - The player's inventory in all slots, excluding the
-     *                        armor slots
-     * @param connection      - A connection to the database
+     *
+     * @param player - The player witch will be his inventory saved
+     * @param dbConnection - A connection to the database
      */
     public static void saveInventoryToDb(Player player, Connection dbConnection) {
 	String sql = "UPDATE lo_users SET armor = ?, inventory = ? WHERE username = ?;";

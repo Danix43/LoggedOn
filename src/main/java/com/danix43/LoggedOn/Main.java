@@ -9,26 +9,32 @@ import com.danix43.LoggedOn.commands.AdminChangePassCommand;
 import com.danix43.LoggedOn.commands.ChangePassCommand;
 import com.danix43.LoggedOn.commands.LoginCommand;
 import com.danix43.LoggedOn.commands.RegisterCommand;
-import com.danix43.LoggedOn.db.Datasource;
 import com.danix43.LoggedOn.listeners.PlayerListener;
+import com.danix43.LoggedOn.storage.DatabaseAccess;
+import com.danix43.LoggedOn.storage.LocalConfigAccess;
 
 /**
  * TODO: - Switch some operations to asyncronous threads
+ * 	 - Implement rest of commands: /changepass, /adminchangepass, etc
+ * 	 - Add embeded SQLite database for testing and on same server storage
+ * 	 - Add posibility to change chat output to different languages 
  */
 public class Main extends JavaPlugin {
     private final Logger log = getLogger();
 
     private Connection connetion;
-    private Datasource datasource = new Datasource();
+    private DatabaseAccess datasource;
 
     @Override
     public void onEnable() {
 	log.info("Plugin starting up");
 
+	LocalConfigAccess config = new LocalConfigAccess(this);
+
+	datasource = new DatabaseAccess(config.getConfig().getConfigurationSection("database"));
+
 	datasource.createDbConnection();
 	connetion = datasource.getConnection();
-
-	System.out.println(connetion);
 
 	getCommand("login").setExecutor(new LoginCommand(connetion));
 	getCommand("register").setExecutor(new RegisterCommand(connetion));
