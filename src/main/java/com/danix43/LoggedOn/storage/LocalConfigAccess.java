@@ -28,6 +28,7 @@ public class LocalConfigAccess {
     private static void addDefaultDbValues(FileConfiguration config) {
 	if (config.getConfigurationSection("database") == null) {
 	    ConfigurationSection section = config.createSection("database");
+	    section.addDefault("is-in-memory", true);
 	    section.addDefault("host-name", "replace me");
 	    section.addDefault("port", 3306);
 	    section.addDefault("database-name", "replace me");

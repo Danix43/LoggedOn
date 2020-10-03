@@ -12,6 +12,8 @@ import com.danix43.LoggedOn.commands.RegisterCommand;
 import com.danix43.LoggedOn.listeners.PlayerListener;
 import com.danix43.LoggedOn.storage.DatabaseAccess;
 import com.danix43.LoggedOn.storage.LocalConfigAccess;
+import com.danix43.LoggedOn.storage.MySQLAccess;
+import com.danix43.LoggedOn.storage.SQLiteAccess;
 
 /**
  * TODO: - Switch some operations to asyncronous threads
@@ -31,7 +33,11 @@ public class Main extends JavaPlugin {
 
 	LocalConfigAccess config = new LocalConfigAccess(this);
 
-	datasource = new DatabaseAccess(config.getConfig().getConfigurationSection("database"));
+	if (config.getConfig().getConfigurationSection("database").getBoolean("is-in-memory")) {
+	    datasource = new SQLiteAccess(config.getConfig().getConfigurationSection("database"), getDataFolder());
+	} else {
+	    datasource = new MySQLAccess(config.getConfig().getConfigurationSection("database"));
+	}
 
 	datasource.createDbConnection();
 	connetion = datasource.getConnection();

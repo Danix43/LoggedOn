@@ -1,6 +1,5 @@
 package com.danix43.LoggedOn.commands;
 
-import static com.danix43.LoggedOn.tools.PlayerToolkit.saveInventoryToDb;
 import static com.danix43.LoggedOn.tools.PlayerToolkit.unfreezePlayer;
 
 import java.sql.Connection;
@@ -50,7 +49,6 @@ public class RegisterCommand implements CommandExecutor {
 	    query.setString(2, password);
 	    query.setString(3, player.getAddress().toString());
 	    query.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-	    saveInventoryToDb(player, connection);
 
 	    query.execute();
 

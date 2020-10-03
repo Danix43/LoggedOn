@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +20,7 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 public class PlayerToolkit {
-    private static final Logger log = Logger.getGlobal();
+    private static final Logger log = Bukkit.getLogger();
 
     private PlayerToolkit() {
 
@@ -46,7 +47,7 @@ public class PlayerToolkit {
     }
 
     public static void loadInventory(Player player, Connection dbConnection) {
-	String sql = "SELECT armor, inventory FROM lo_users WHERE username = ?;";
+	String sql = "SELECT armor, inventory FROM lo_users WHERE username = ?";
 
 	try (PreparedStatement query = dbConnection.prepareStatement(sql)) {
 	    query.setString(1, player.getName());
@@ -54,16 +55,24 @@ public class PlayerToolkit {
 	    try (ResultSet result = query.executeQuery()) {
 		result.next();
 
-		Blob armor = result.getBlob("armor");
-		Blob inventory = result.getBlob("inventory");
-
-		try {
-		    player.getInventory().setArmorContents(
-		            convertByteArrToItems(armor.getBytes(1L, Math.toIntExact(armor.length()))));
-		    player.getInventory().setStorageContents(
-		            convertByteArrToItems(inventory.getBytes(1L, Math.toIntExact(inventory.length()))));
-		} catch (NullPointerException e) {
-		    System.out.println("The armor or inventory blob is empty");
+		if (dbConnection.getMetaData().getDriverName().equals("SQLite JDBC")) {
+		    try {
+			player.getInventory().setArmorContents(convertByteArrToItems(result.getBytes("armor")));
+			player.getInventory().setStorageContents(convertByteArrToItems(result.getBytes("inventory")));
+		    } catch (NullPointerException e) {
+			System.out.println("The armor or inventory blob is empty");
+		    }
+		} else {
+		    Blob armor = result.getBlob("armor");
+		    Blob inventory = result.getBlob("inventory");
+		    try {
+			player.getInventory().setArmorContents(
+			        convertByteArrToItems(armor.getBytes(1L, Math.toIntExact(armor.length()))));
+			player.getInventory().setStorageContents(
+			        convertByteArrToItems(inventory.getBytes(1L, Math.toIntExact(inventory.length()))));
+		    } catch (NullPointerException e) {
+			System.out.println("The armor or inventory blob is empty");
+		    }
 		}
 
 	    } catch (SQLException e) {
@@ -82,25 +91,30 @@ public class PlayerToolkit {
      * @param dbConnection - A connection to the database
      */
     public static void saveInventoryToDb(Player player, Connection dbConnection) {
-	String sql = "UPDATE lo_users SET armor = ?, inventory = ? WHERE username = ?;";
+	String sql = "UPDATE lo_users SET armor = ?, inventory = ? WHERE username = ?";
 	try (PreparedStatement query = dbConnection.prepareStatement(sql)) {
+	    if (dbConnection.getMetaData().getDriverName().equals("SQLite JDBC")) {
+		query.setBytes(1, convertItemsToByteArr(player.getInventory().getArmorContents()));
 
-	    Blob armorBLOB = dbConnection.createBlob();
-	    armorBLOB.setBytes(1L, convertItemsToByteArr(player.getInventory().getArmorContents()));
+		query.setBytes(2, convertItemsToByteArr(player.getInventory().getStorageContents()));
+	    } else {
+		Blob armorBLOB = dbConnection.createBlob();
+		armorBLOB.setBytes(1L, convertItemsToByteArr(player.getInventory().getArmorContents()));
 
-	    Blob inventoryBLOB = dbConnection.createBlob();
-	    inventoryBLOB.setBytes(1L, convertItemsToByteArr(player.getInventory().getStorageContents()));
+		Blob inventoryBLOB = dbConnection.createBlob();
+		inventoryBLOB.setBytes(1L, convertItemsToByteArr(player.getInventory().getStorageContents()));
 
-	    System.out.println("armor Blob: " + armorBLOB);
-	    System.out.println("inventory Blob: " + inventoryBLOB);
+		query.setBlob(1, armorBLOB);
+		query.setBlob(2, inventoryBLOB);
+	    }
 
-	    query.setBlob(1, armorBLOB);
-	    query.setBlob(2, inventoryBLOB);
 	    query.setString(3, player.getName());
 
 	    query.executeUpdate();
 	} catch (SQLException e) {
-	    log.warning("Error saving the inventory to database. Error: " + e.getMessage());
+	    log.warning("Error saving the inventory to database. Error: " + e.getSQLState());
+	    log.warning("Error saving the inventory to database. Error: ");
+	    e.printStackTrace();
 	}
     }
 
@@ -125,7 +139,7 @@ public class PlayerToolkit {
 	}
     }
 
-    public static ItemStack[] convertByteArrToItems(byte[] itemArr) {
+    private static ItemStack[] convertByteArrToItems(byte[] itemArr) {
 	try (ByteArrayInputStream bais = new ByteArrayInputStream(itemArr);
 	        BukkitObjectInputStream bois = new BukkitObjectInputStream(bais)) {
 
