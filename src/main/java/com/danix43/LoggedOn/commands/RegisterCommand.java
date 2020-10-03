@@ -15,6 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.danix43.LoggedOn.tools.TextServer;
+
 public class RegisterCommand implements CommandExecutor {
     private static final String ALREADY_EXISTS_QUERY = "SELECT * FROM lo_users WHERE username = ?;";
     private static final String REGISTER_USER_QUERY = "INSERT INTO lo_users (username, password, ip, registerdate) VALUES(?, ?, ?, ?);";
@@ -23,8 +25,11 @@ public class RegisterCommand implements CommandExecutor {
 
     private final Connection connection;
 
-    public RegisterCommand(Connection dbConnection) {
+    private TextServer text;
+
+    public RegisterCommand(Connection dbConnection, TextServer text) {
 	this.connection = dbConnection;
+	this.text = text;
     }
 
     @Override
@@ -35,11 +40,11 @@ public class RegisterCommand implements CommandExecutor {
 		registerNewPlayer(player, BCrypt.hashpw(args[0], BCrypt.gensalt()));
 		return true;
 	    } else {
-		player.sendMessage("There is a another account registered with your name!");
+		player.sendMessage(text.getRegisterAlreadyRegisterd());
 		return true;
 	    }
 	}
-	sender.sendMessage("You can't register as a console or a command block!");
+	sender.sendMessage(text.getRegisterNotPlayerText());
 	return true;
     }
 
@@ -52,7 +57,7 @@ public class RegisterCommand implements CommandExecutor {
 
 	    query.execute();
 
-	    player.sendMessage("You have been registered!");
+	    player.sendMessage(text.getRegisterRegisteredText());
 	    unfreezePlayer(player);
 	} catch (SQLException e) {
 	    log.warning("Error registering the new player. Error: " + e.getMessage());

@@ -12,19 +12,12 @@ public class LocalConfigAccess {
 	this.config = plugin.getConfig();
 
 	addDefaultDbValues(config);
+	addDefaultLanguageValues(config);
 
 	config.options().copyDefaults(true);
 	plugin.saveConfig();
     }
 
-    /*
-     * needed for config file - db: 
-     * - host
-     * - port
-     * - schema name
-     * - username
-     * - password
-     */
     private static void addDefaultDbValues(FileConfiguration config) {
 	if (config.getConfigurationSection("database") == null) {
 	    ConfigurationSection section = config.createSection("database");
@@ -34,6 +27,25 @@ public class LocalConfigAccess {
 	    section.addDefault("database-name", "replace me");
 	    section.addDefault("database-username", "replace me");
 	    section.addDefault("database-password", "replace me");
+	}
+    }
+
+    private static void addDefaultLanguageValues(FileConfiguration config) {
+	if (config.getConfigurationSection("language") == null) {
+	    ConfigurationSection section = config.createSection("language");
+	    section.addDefault("player-enter",
+	            "Use '/register [yourpassword]' to make an account or use '/login [yourpassword]' to log into yours!");
+
+	    section.addDefault("register-already-registered", "There is a another account registered with your name!");
+	    section.addDefault("register-registered", "You have been registered!");
+	    section.addDefault("register-not-player", "You can't register as a console or a command block!");
+
+	    section.addDefault("login-not-registered", "You don't have an account registered.\n"
+	            + "Use the command '/register [yourpassword]' to register");
+	    section.addDefault("login-not-player", "You can't log in from console or a command block!");
+	    section.addDefault("login-loggedon", "You have been logged on! Enjoy!");
+	    section.addDefault("login-wrong-password", "Wrong password. Try again");
+	    section.addDefault("login-failed-login", "Failed to login in time!");
 	}
     }
 

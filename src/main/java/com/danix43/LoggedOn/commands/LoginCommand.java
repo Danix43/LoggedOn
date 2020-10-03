@@ -15,6 +15,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.danix43.LoggedOn.tools.TextServer;
+
 public class LoginCommand implements CommandExecutor {
     private static final String ALREADY_EXISTS_QUERY = "SELECT * FROM lo_users WHERE username = ?;";
     private static final String LOGIN_PLAYER_QUERY = "SELECT password, inventory FROM lo_users WHERE username = ?;";
@@ -22,8 +24,11 @@ public class LoginCommand implements CommandExecutor {
     private static final Logger log = Logger.getGlobal();
     private final Connection connection;
 
-    public LoginCommand(Connection dbConnection) {
+    private TextServer text;
+
+    public LoginCommand(Connection dbConnection, TextServer ts) {
 	this.connection = dbConnection;
+	this.text = ts;
     }
 
     /*
@@ -38,13 +43,12 @@ public class LoginCommand implements CommandExecutor {
 		logInPlayer(player, args[0]);
 		return true;
 	    } else {
-		player.sendRawMessage(
-		        "You don't have an account registered.\nUse the command '/register [yourpassword]' to register");
+		player.sendMessage(text.getLoginNotRegisteredText());
 		return true;
 	    }
 	}
 
-	sender.sendMessage("You can't log in from console or a command block!");
+	sender.sendMessage(text.getLoginNotPlayerText());
 	return true;
     }
 
@@ -56,14 +60,14 @@ public class LoginCommand implements CommandExecutor {
 		result.next();
 		String dbPassword = result.getString("password");
 		if (BCrypt.checkpw(password, dbPassword)) {
-		    player.sendMessage("You have been logged on! Enjoy!");
+		    player.sendMessage(text.getLoginLoggedOnText());
 		    loadInventory(player, connection);
 		    unfreezePlayer(player);
 		} else {
-		    player.sendMessage("Wrong password. Try again");
+		    player.sendMessage(text.getLoginWrongPasswordText());
 		    loggingAttempts++;
 		    if (loggingAttempts == 3) {
-			player.kickPlayer("Failed to login in time!");
+			player.kickPlayer(text.getLoginFailedLoginText());
 		    }
 		}
 	    }

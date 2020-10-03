@@ -11,20 +11,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import com.danix43.LoggedOn.tools.TextServer;
+
 public class PlayerListener implements Listener {
 
     private Connection connection;
+    private TextServer text;
 
-    public PlayerListener(Connection dbConnection) {
+    public PlayerListener(Connection dbConnection, TextServer texts) {
 	this.connection = dbConnection;
+	this.text = texts;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
 	Player player = event.getPlayer();
 	freezePlayer(player);
-	player.sendMessage(
-	        "Use '/register [yourpassword]' to make an account or use '/login [yourpassword]' to log into yours!");
+	player.sendMessage(text.getPlayerEnterText());
     }
 
     @EventHandler

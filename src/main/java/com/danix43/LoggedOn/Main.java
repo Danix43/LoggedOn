@@ -14,12 +14,11 @@ import com.danix43.LoggedOn.storage.DatabaseAccess;
 import com.danix43.LoggedOn.storage.LocalConfigAccess;
 import com.danix43.LoggedOn.storage.MySQLAccess;
 import com.danix43.LoggedOn.storage.SQLiteAccess;
+import com.danix43.LoggedOn.tools.TextServer;
 
 /**
  * TODO: - Switch some operations to asyncronous threads
  * 	 - Implement rest of commands: /changepass, /adminchangepass, etc
- * 	 - Add embeded SQLite database for testing and on same server storage
- * 	 - Add posibility to change chat output to different languages 
  */
 public class Main extends JavaPlugin {
     private final Logger log = getLogger();
@@ -33,6 +32,8 @@ public class Main extends JavaPlugin {
 
 	LocalConfigAccess config = new LocalConfigAccess(this);
 
+	TextServer text = TextServer.getInstance(config.getConfig().getConfigurationSection("language"));
+
 	if (config.getConfig().getConfigurationSection("database").getBoolean("is-in-memory")) {
 	    datasource = new SQLiteAccess(config.getConfig().getConfigurationSection("database"), getDataFolder());
 	} else {
@@ -42,12 +43,12 @@ public class Main extends JavaPlugin {
 	datasource.createDbConnection();
 	connetion = datasource.getConnection();
 
-	getCommand("login").setExecutor(new LoginCommand(connetion));
-	getCommand("register").setExecutor(new RegisterCommand(connetion));
+	getCommand("login").setExecutor(new LoginCommand(connetion, text));
+	getCommand("register").setExecutor(new RegisterCommand(connetion, text));
 	getCommand("changepass").setExecutor(new ChangePassCommand());
 	getCommand("admin.changepass").setExecutor(new AdminChangePassCommand());
 
-	getServer().getPluginManager().registerEvents(new PlayerListener(connetion), this);
+	getServer().getPluginManager().registerEvents(new PlayerListener(connetion, text), this);
 
 	log.info("Plugin fully started");
     }
