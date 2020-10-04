@@ -23,7 +23,7 @@ import com.danix43.LoggedOn.tools.TextServer;
 public class Main extends JavaPlugin {
     private final Logger log = getLogger();
 
-    private Connection connetion;
+    private Connection connection;
     private DatabaseAccess datasource;
 
     @Override
@@ -41,14 +41,14 @@ public class Main extends JavaPlugin {
 	}
 
 	datasource.createDbConnection();
-	connetion = datasource.getConnection();
+	connection = datasource.getConnection();
 
-	getCommand("login").setExecutor(new LoginCommand(connetion, text));
-	getCommand("register").setExecutor(new RegisterCommand(connetion, text));
-	getCommand("changepass").setExecutor(new ChangePassCommand());
+	getCommand("login").setExecutor(new LoginCommand(connection, text));
+	getCommand("register").setExecutor(new RegisterCommand(connection, text));
+	getCommand("changepass").setExecutor(new ChangePassCommand(connection, text));
 	getCommand("admin.changepass").setExecutor(new AdminChangePassCommand());
 
-	getServer().getPluginManager().registerEvents(new PlayerListener(connetion, text), this);
+	getServer().getPluginManager().registerEvents(new PlayerListener(connection, text), this);
 
 	log.info("Plugin fully started");
     }

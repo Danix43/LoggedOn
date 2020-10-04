@@ -13,32 +13,37 @@ public class TextServer {
 
     private static TextServer instance;
 
-    private final Map<String, String> texts;
+    private Map<String, String> texts;
 
     /**
      * Retrieve the text from the config file
      * @param config
      */
     private TextServer(ConfigurationSection config) {
+	this.texts = null;
 	texts = populateList(config);
     }
 
     private static Map<String, String> populateList(ConfigurationSection config) {
 	Map<String, String> map = new HashMap<>();
 
-	map.put("player-enter",
-	        config.getString("player-enter"));
+	map.put("player-enter", config.getString("player-enter"));
 
 	map.put("register-already-registered", config.getString("register-already-registered"));
 	map.put("register-registered", config.getString("register-registered"));
 	map.put("register-not-player", config.getString("register-not-player"));
 
-	map.put("login-not-registered",
-	        config.getString("login-not-registered"));
+	map.put("login-not-registered", config.getString("login-not-registered"));
 	map.put("login-not-player", config.getString("login-not-player"));
 	map.put("login-loggedon", config.getString("login-loggedon"));
 	map.put("login-wrong-password", config.getString("login-wrong-password"));
 	map.put("login-failed-login", config.getString("login-failed-login"));
+
+	map.put("changepass-success", config.getString("changepass-success"));
+	map.put("changepass-fail", config.getString("changepass-fail"));
+	map.put("changepass-error-update", config.getString("changepass-error-update"));
+	map.put("changepass-error-retrieve", config.getString("changepass-error-retrieve"));
+	map.put("changepass-error-notenoughargs", "Not enough arguments provided!");
 
 	return map;
     }
@@ -84,6 +89,26 @@ public class TextServer {
 
     public String getLoginFailedLoginText() {
 	return texts.get("login-failed-login");
+    }
+
+    public String getChangePassSuccessText() {
+	return texts.get("changepass-success");
+    }
+
+    public String getChangePassFailText() {
+	return texts.get("changepass-fail");
+    }
+
+    public String getChangePassErrorUpdateText() {
+	return texts.get("changepass-error-update");
+    }
+
+    public String getChangePassErrorRetrieveText() {
+	return texts.get("changepass-error-retrieve");
+    }
+
+    public String getChangePassErrorNotEnoughArgsText() {
+	return texts.get("changepass-error-notenoughargs");
     }
 
 }

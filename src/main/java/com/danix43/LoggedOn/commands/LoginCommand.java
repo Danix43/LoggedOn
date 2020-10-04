@@ -19,7 +19,7 @@ import com.danix43.LoggedOn.tools.TextServer;
 
 public class LoginCommand implements CommandExecutor {
     private static final String ALREADY_EXISTS_QUERY = "SELECT * FROM lo_users WHERE username = ?;";
-    private static final String LOGIN_PLAYER_QUERY = "SELECT password, inventory FROM lo_users WHERE username = ?;";
+    private static final String LOGIN_PLAYER_QUERY = "SELECT password FROM lo_users WHERE username = ?;";
 
     private static final Logger log = Logger.getGlobal();
     private final Connection connection;

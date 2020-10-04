@@ -46,6 +46,12 @@ public class LocalConfigAccess {
 	    section.addDefault("login-loggedon", "You have been logged on! Enjoy!");
 	    section.addDefault("login-wrong-password", "Wrong password. Try again");
 	    section.addDefault("login-failed-login", "Failed to login in time!");
+
+	    section.addDefault("changepass-success", "Password changed successfully");
+	    section.addDefault("changepass-fail", "The old password isn't the same with the one that you logged in!");
+	    section.addDefault("changepass-error-update", "Can't update the password in the db. Error ");
+	    section.addDefault("changepass-error-retrieve", "Can't retrieve the password from the db. Error ");
+	    section.addDefault("changepass-error-notenoughargs", "Not enough arguments provided!");
 	}
     }
 
