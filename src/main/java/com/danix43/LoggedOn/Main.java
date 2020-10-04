@@ -46,7 +46,7 @@ public class Main extends JavaPlugin {
 	getCommand("login").setExecutor(new LoginCommand(connection, text));
 	getCommand("register").setExecutor(new RegisterCommand(connection, text));
 	getCommand("changepass").setExecutor(new ChangePassCommand(connection, text));
-	getCommand("admin.changepass").setExecutor(new AdminChangePassCommand());
+	getCommand("admin.changepass").setExecutor(new AdminChangePassCommand(connection, text));
 
 	getServer().getPluginManager().registerEvents(new PlayerListener(connection, text), this);
 

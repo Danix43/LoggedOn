@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,10 +41,10 @@ public class ChangePassCommand implements CommandExecutor {
 
 	    if (checkIfPasswordAreSame(player.getName(), args[0])) {
 		changePassword(player.getName(), args[1]);
-		player.sendMessage(text.getChangePassSuccessText());
+		player.sendMessage(ChatColor.GREEN + text.getChangePassSuccessText());
 		return true;
 	    } else {
-		player.sendMessage(text.getChangePassFailText());
+		player.sendMessage(ChatColor.RED + text.getChangePassFailText());
 		return true;
 	    }
         }

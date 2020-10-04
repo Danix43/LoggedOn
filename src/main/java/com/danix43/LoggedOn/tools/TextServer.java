@@ -15,10 +15,6 @@ public class TextServer {
 
     private Map<String, String> texts;
 
-    /**
-     * Retrieve the text from the config file
-     * @param config
-     */
     private TextServer(ConfigurationSection config) {
 	this.texts = null;
 	texts = populateList(config);

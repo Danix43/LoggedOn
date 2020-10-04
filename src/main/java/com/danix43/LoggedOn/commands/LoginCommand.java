@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,11 +40,17 @@ public class LoginCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 	if (sender instanceof Player) {
 	    Player player = (Player) sender;
+
+	    if (args[0] == null) {
+		player.sendMessage(ChatColor.RED + text.getChangePassErrorNotEnoughArgsText());
+		return false;
+	    }
+
 	    if (playerHasAccount(player)) {
 		logInPlayer(player, args[0]);
 		return true;
 	    } else {
-		player.sendMessage(text.getLoginNotRegisteredText());
+		player.sendMessage(ChatColor.RED + text.getLoginNotRegisteredText());
 		return true;
 	    }
 	}
@@ -60,14 +67,14 @@ public class LoginCommand implements CommandExecutor {
 		result.next();
 		String dbPassword = result.getString("password");
 		if (BCrypt.checkpw(password, dbPassword)) {
-		    player.sendMessage(text.getLoginLoggedOnText());
+		    player.sendMessage(ChatColor.GREEN + text.getLoginLoggedOnText());
 		    loadInventory(player, connection);
 		    unfreezePlayer(player);
 		} else {
-		    player.sendMessage(text.getLoginWrongPasswordText());
+		    player.sendMessage(ChatColor.RED + text.getLoginWrongPasswordText());
 		    loggingAttempts++;
 		    if (loggingAttempts == 3) {
-			player.kickPlayer(text.getLoginFailedLoginText());
+			player.kickPlayer(ChatColor.RED + text.getLoginFailedLoginText());
 		    }
 		}
 	    }

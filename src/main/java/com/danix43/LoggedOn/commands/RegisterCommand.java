@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,11 +37,17 @@ public class RegisterCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 	if (sender instanceof Player) {
 	    Player player = (Player) sender;
+
+	    if (args[0] == null) {
+		player.sendMessage(ChatColor.RED + text.getChangePassErrorNotEnoughArgsText());
+		return false;
+	    }
+
 	    if (!checkIfPlayerAlreadyRegistered(player)) {
 		registerNewPlayer(player, BCrypt.hashpw(args[0], BCrypt.gensalt()));
 		return true;
 	    } else {
-		player.sendMessage(text.getRegisterAlreadyRegisterd());
+		player.sendMessage(ChatColor.RED + text.getRegisterAlreadyRegisterd());
 		return true;
 	    }
 	}
@@ -57,7 +64,7 @@ public class RegisterCommand implements CommandExecutor {
 
 	    query.execute();
 
-	    player.sendMessage(text.getRegisterRegisteredText());
+	    player.sendMessage(ChatColor.RED + text.getRegisterRegisteredText());
 	    unfreezePlayer(player);
 	} catch (SQLException e) {
 	    log.warning("Error registering the new player. Error: " + e.getMessage());
