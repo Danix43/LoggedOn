@@ -12,12 +12,10 @@
 **This is made specifically to work in a low-powered server that gets at most 10 players, and stability and security may be questionable on larger server**
 	
 ## For the future
-	* Improve performance even more by integrating and convering existing code to syncronous operations
-	* Adding settings in a config file so that the user can tailor his plugin to his needs
-	* Add support for multiple languages so that your server appears more proffesional
-	* Adding more options for server administators, changing passwords for users, seeing more user stats and many more
-	* Adding support for an embeded database for admins that only need a test instance or don't need a fully fledged MySQL server
-	* And many more to come
+* Improve performance even more by integrating and convering existing code to syncronous operations
+* Adding settings in a config file so that the user can tailor his plugin to his needs
+* Adding more options for server administators, changing passwords for users, seeing more user stats and many more
+* And many more to come
 
 ## Instalation
 
